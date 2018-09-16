@@ -100,6 +100,7 @@
         var reversedChicagoStartups = [];
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
+                // case when a prev click has initialized id 'reverseContainer' with list contents
                 while (reverseContainer.hasChildNodes()) {
                     reversedChicagoStartups.push(reverseContainer.lastChild.innerHTML);
                     reverseContainer.removeChild(reverseContainer.lastChild);
@@ -112,8 +113,9 @@
                     reverseContainer.appendChild(childDiv);
                 });
             } else {
+                // There hasn't been any click, so the list comes from var chicagoStartups
                 //TODO:: REPLACE [chicagoStartups.reverse()] WITH A FUNCTION CALLED "chicagoStartupsReverse"
-                chicagoStartups.reverse().forEach(function(startup) {
+                chicagoStartupsReverse().forEach(function(startup) {
                     var childDiv = document.createElement('div');
                     var text = document.createTextNode(startup);
                     childDiv.appendChild(text);
@@ -123,19 +125,32 @@
         }
     }
 
-    function chicagoStartupsReverse() {
-        var reversedStartups = [];
+    function myReverse(myList) {
         /*
-            TODO: REVERSE THE CONTENTS OF THE ARRAY WITHOUT USING THE BUILT IN REVERSE METHOD
-                  RETURN THE REVERSED ARRAY
-
-            TIPS: 
-                1.  REVIEW JAVASCRIPT ARRAY DATA STRUCTURE AND THE BUILTIN METHODS PROVIDED TO ALL ARRAYS
-
-                2.  THIS IS A COMMON JOB INTERVIEW QUESTION, THAT SHOULD BE SOLVABLE BASED ON AN UNDERSTANDING OF
-                    DATA STRUTUCTURES REGARDLESS OF THE PROGRAMMING LANGUAGE
-        
+        returns revers of list.  uses anonymous function that 
+            returns array items with opposite index: 
+            returns 
+             - last wen involed on first
+             - secod to last when involed on secxond    
         */
+        return myList.map(function(myValue, myIndex, myArray) {
+            return myArray[myArray.length - myIndex - 1];
+        });
+    }
+
+    function chicagoStartupsReverse() {
+        var reversedStartups = myReverse(chicagoStartups);
+        /*
+                TODO: REVERSE THE CONTENTS OF THE ARRAY WITHOUT USING THE BUILT IN REVERSE METHOD
+                      RETURN THE REVERSED ARRAY
+
+                TIPS: 
+                    1.  REVIEW JAVASCRIPT ARRAY DATA STRUCTURE AND THE BUILTIN METHODS PROVIDED TO ALL ARRAYS
+
+                    2.  THIS IS A COMMON JOB INTERVIEW QUESTION, THAT SHOULD BE SOLVABLE BASED ON AN UNDERSTANDING OF
+                        DATA STRUTUCTURES REGARDLESS OF THE PROGRAMMING LANGUAGE
+        
+            */
         return reversedStartups;
     }
 
@@ -180,7 +195,7 @@
     }
 
     function run() {
-
+        instructions();
         initDocument();
         initReverse();
     }
@@ -189,7 +204,7 @@
         displayInstructions: true
     };
 
-    //TODO INVOKE THIS ANONYMOUS FUNCTION TO DISPLAY HOMEWORK INSTRUCTIONS IN THE CONSOLE
+    //TODone INVOKE THIS ANONYMOUS FUNCTION TO DISPLAY HOMEWORK INSTRUCTIONS IN THE CONSOLE
     var instructions = function() {
         if (flags.displayInstructions) {
             console.log(`
@@ -226,8 +241,6 @@
         }
 
     };
-
-    instructions();
     run();
 
 </script>
