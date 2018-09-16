@@ -72,6 +72,7 @@
     ];
 
     function clearDocument() {
+        // if there is an existing id=rootContainer clear out all child elements.
         var rootDiv = document.getElementById('rootContainer');
         if (rootDiv) {
             while (rootDiv.hasChildNodes()) {
@@ -81,6 +82,10 @@
     }
 
     function initDocument() {
+        /*
+        starts out an empt root container and add the company names 
+        as a numbers list of div elements.
+        */
         clearDocument();
         var rootDiv = document.createElement('div');
         rootDiv.id = 'rootContainer';
@@ -95,53 +100,65 @@
         document.body.appendChild(rootDiv);
     }
 
+    function renderList(aList, aContainer, anElemetType) {
+        /*
+        for each item in myList, 
+         - use the item as contents in a myElementType
+         - add it as a child Elent in myContainer 
+        */
+        aList.forEach(function(itemText, index) {
+            console.log(itemText);
+            var childElem = document.createElement(anElemetType);
+            var text = document.createTextNode(itemText);
+            childElem.appendChild(text);
+            aContainer.appendChild(childElem);
+        });
+    }
+
     function renderReversedElements() {
+        /*
+        event reversing element id=reverseContainer
+        */
         var reverseContainer = document.getElementById('reverseContainer');
         var reversedChicagoStartups = [];
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
                 // case when a prev click has initialized id 'reverseContainer' with list contents
                 while (reverseContainer.hasChildNodes()) {
+                    /*
+                    this loop is grabbing the last elements in the doc and them to a list
+                    list, reversing the order.
+                    */
                     reversedChicagoStartups.push(reverseContainer.lastChild.innerHTML);
                     reverseContainer.removeChild(reverseContainer.lastChild);
                 }
-                reversedChicagoStartups.forEach(function(chicagoStartup, index) {
-                    console.log(chicagoStartup);
-                    var childDiv = document.createElement('div');
-                    var text = document.createTextNode(chicagoStartup);
-                    childDiv.appendChild(text);
-                    reverseContainer.appendChild(childDiv);
-                });
+                // creating elements from the list and render in container.
+                renderList(reversedChicagoStartups, reverseContainer, 'div')
             } else {
                 // There hasn't been any click, so the list comes from var chicagoStartups
-                //TODO:: REPLACE [chicagoStartups.reverse()] WITH A FUNCTION CALLED "chicagoStartupsReverse"
-                chicagoStartupsReverse().forEach(function(startup) {
-                    var childDiv = document.createElement('div');
-                    var text = document.createTextNode(startup);
-                    childDiv.appendChild(text);
-                    reverseContainer.appendChild(childDiv);
-                });
+                //TODone:: REPLACE [chicagoStartups.reverse()] WITH A FUNCTION CALLED "chicagoStartupsReverse"
+                renderList(chicagoStartupsReverse(), reverseContainer, 'div')
             }
         }
     }
 
-    function myReverse(myList) {
+    function myReverse(aList) {
         /*
         returns revers of list.  uses anonymous function that 
             returns array items with opposite index: 
-            returns 
-             - last wen involed on first
-             - secod to last when involed on secxond    
+            the anonymous function returns 
+             - last item when involed on first item
+             - second to last item when invoked on second item    
         */
-        return myList.map(function(myValue, myIndex, myArray) {
-            return myArray[myArray.length - myIndex - 1];
+        return aList.map(function(aValue, anIndex, anArray) {
+            return anArray[anArray.length - anIndex - 1];
         });
     }
 
     function chicagoStartupsReverse() {
         var reversedStartups = myReverse(chicagoStartups);
         /*
-                TODO: REVERSE THE CONTENTS OF THE ARRAY WITHOUT USING THE BUILT IN REVERSE METHOD
+                TODone: REVERSE THE CONTENTS OF THE ARRAY WITHOUT USING THE BUILT IN REVERSE METHOD
                       RETURN THE REVERSED ARRAY
 
                 TIPS: 
@@ -161,21 +178,34 @@
               DISPLAYS THE NUMBER OF REMAINING CHARACTERS NEXT TO THE FULL WORD.
               DONT FORGET TO REMOVE LEADING AND TRAILING WHITESPACES AS WELL
         */
+        // extra credit by using an object to count the number of occurrences 
 
     }
 
     function initReverse() {
+        /*
+        creates reverseContainer as child of root, 
+        then registers a button with an event renderReversedElements.
+        */
         var reverseContainer = document.createElement('div');
         reverseContainer.id = 'reverseContainer';
-        var reverseBtn = document.createElement('button');
-        var btnText = document.createTextNode('Reverse');
-        reverseBtn.onclick = renderReversedElements;
-        reverseBtn.appendChild(btnText);
-        var reverseButtonContainer = document.createElement('div');
-        reverseButtonContainer.appendChild(reverseBtn);
-        document.getElementById('rootContainer').appendChild(reverseButtonContainer);
+
+        document.getElementById('rootContainer').appendChild(btnFactory('Reverse', renderReversedElements));
+        document.getElementById('rootContainer').appendChild(btnFactory('Toggle Display', toggleDisplay));
         document.getElementById('rootContainer').appendChild(reverseContainer);
     }
+
+    function btnFactory(aLabel, aCallback) {
+        var btn = document.createElement('button');
+        console.log("aLabel", aLabel)
+        var btnText = document.createTextNode(aLabel);
+        btn.onclick = aCallback;
+        btn.appendChild(btnText);
+        var btnContainer = document.createElement('div');
+        btnContainer.appendChild(btn);
+        return btnContainer;
+    }
+
 
     function toggleDisplay() {
         /*
@@ -192,6 +222,8 @@
 
             3.  
         */
+        console.log('toggleDisplay called');
+
     }
 
     function run() {
