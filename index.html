@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <h3>Javascript Basics</h3>
-    <button onclick="cleanAndCountCharacters()">
+<h3>Javascript Basics</h3>
+<button onclick="cleanAndCountCharacters()">
         clean and count words
     </button>
-    <body>
-    </body>
+
+<body>
+</body>
+
 </html>
 
 <style>
@@ -13,6 +15,7 @@
         display: flex;
 
     }
+
     .root-container {
         position: relative;
     }
@@ -44,6 +47,7 @@
     .gold {
         background-image: gold;
     }
+
 </style>
 
 <script>
@@ -81,7 +85,7 @@
         var rootDiv = document.createElement('div');
         rootDiv.id = 'rootContainer';
         var companyNamesContainer = document.createElement('div');
-        chicagoStartups.forEach( function(chicagoStartup, index) {
+        chicagoStartups.forEach(function(chicagoStartup, index) {
             var childDiv = document.createElement('div');
             var text = document.createTextNode(index.toString().concat(' .) ').concat(chicagoStartup));
             childDiv.appendChild(text);
@@ -107,10 +111,9 @@
                     childDiv.appendChild(text);
                     reverseContainer.appendChild(childDiv);
                 });
-            }
-            else {
+            } else {
                 //TODO:: REPLACE [chicagoStartups.reverse()] WITH A FUNCTION CALLED "chicagoStartupsReverse"
-                chicagoStartups.reverse().forEach( function(startup) {
+                chicagoStartups.reverse().forEach(function(startup) {
                     var childDiv = document.createElement('div');
                     var text = document.createTextNode(startup);
                     childDiv.appendChild(text);
@@ -145,7 +148,7 @@
         */
 
     }
-    
+
     function initReverse() {
         var reverseContainer = document.createElement('div');
         reverseContainer.id = 'reverseContainer';
@@ -154,7 +157,7 @@
         reverseBtn.onclick = renderReversedElements;
         reverseBtn.appendChild(btnText);
         var reverseButtonContainer = document.createElement('div');
-        reverseButtonContainer.appendChild(reverseBtn);    
+        reverseButtonContainer.appendChild(reverseBtn);
         document.getElementById('rootContainer').appendChild(reverseButtonContainer);
         document.getElementById('rootContainer').appendChild(reverseContainer);
     }
@@ -175,19 +178,19 @@
             3.  
         */
     }
-    
+
     function run() {
+
         initDocument();
         initReverse();
     }
-    run();
-    
+
     var flags = {
         displayInstructions: true
     };
 
     //TODO INVOKE THIS ANONYMOUS FUNCTION TO DISPLAY HOMEWORK INSTRUCTIONS IN THE CONSOLE
-    (function() {
+    var instructions = function() {
         if (flags.displayInstructions) {
             console.log(`
                             ASSUMPTIONS: !!! NO JQUERY !!! 
@@ -221,7 +224,10 @@
 
                         `);
         }
-        
-    });
+
+    };
+
+    instructions();
+    run();
 
 </script>
