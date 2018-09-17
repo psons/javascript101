@@ -83,7 +83,7 @@
 
     function initDocument() {
         /*
-        starts out an empt root container and add the company names 
+        starts out an empty root container and add the company names 
         as a numbers list of div elements.
         */
         clearDocument();
@@ -115,29 +115,61 @@
         });
     }
 
-    function renderReversedElements() {
+    function getElemenInnerAsList(aContainer) {
         /*
-        event reversing element id=reverseContainer
+        This removes the chile elements, but captures the inner HTML in a list
+        */
+        retList = []
+        while (aContainer.hasChildNodes()) {
+            /*
+            this loop is grabbing the last elements in the doc and them to a list
+            list, reversing the order.
+            */
+            retList.push(aContainer.firstChild.innerHTML);
+            aContainer.removeChild(aContainer.firstChild);
+        }
+        return retList
+    }
+
+
+    function renderReverseWithoutReversing() {
+        /*
+        re-rendering element id=reverseContainer, in case the displayModeIndex has changed
+        the toggle button just toggles the display mode, so we need to re-render without reversing.
         */
         var reverseContainer = document.getElementById('reverseContainer');
-        var reversedChicagoStartups = [];
+        var myChicagoStartups = [];
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
                 // case when a prev click has initialized id 'reverseContainer' with list contents
-                while (reverseContainer.hasChildNodes()) {
-                    /*
-                    this loop is grabbing the last elements in the doc and them to a list
-                    list, reversing the order.
-                    */
-                    reversedChicagoStartups.push(reverseContainer.lastChild.innerHTML);
-                    reverseContainer.removeChild(reverseContainer.lastChild);
-                }
-                // creating elements from the list and render in container.
-                renderList(reversedChicagoStartups, reverseContainer, 'div')
+                myChicagoStartups = getElemenInnerAsList(reverseContainer)
+                renderList(chicagoStartups, reverseContainer, displayModes[displayModeIndex])
+            }
+
+        }
+    }
+
+
+    function renderReversedElements() {
+        /*
+        event reversing element id=reverseContainer
+        I've left the flow somewhat as provided in the assignment, and I cal the provided stub:
+         - chicagoStartupsReverse()
+        
+        */
+        var reverseContainer = document.getElementById('reverseContainer');
+        var reversedChicagoStartups = [];
+        var myChicagoStartups;
+        if (reverseContainer) {
+            if (reverseContainer.hasChildNodes()) {
+                // case when a prev click has initialized id 'reverseContainer' with list contents
+                myChicagoStartups = getElemenInnerAsList(reverseContainer)
+                reversedChicagoStartups = myReverse(myChicagoStartups)
+                renderList(reversedChicagoStartups, reverseContainer, displayModes[displayModeIndex])
             } else {
                 // There hasn't been any click, so the list comes from var chicagoStartups
                 //TODone:: REPLACE [chicagoStartups.reverse()] WITH A FUNCTION CALLED "chicagoStartupsReverse"
-                renderList(chicagoStartupsReverse(), reverseContainer, 'div')
+                renderList(chicagoStartupsReverse(), reverseContainer, displayModes[displayModeIndex])
             }
         }
     }
@@ -222,8 +254,11 @@
 
             3.  
         */
+        // PGSTODO - clean this up some.
         console.log('toggleDisplay called');
-
+        displayModeIndex = (displayModeIndex + 1) % (displayModes.length);
+        console.log('displayModeIndex:', displayModeIndex)
+        renderReverseWithoutReversing();
     }
 
     function run() {
@@ -232,8 +267,11 @@
         initReverse();
     }
 
+    displayModes = ['div', 'span'];
+    displayModeIndex = 1;
+
     var flags = {
-        displayInstructions: true
+        displayInstructions: true,
     };
 
     //TODone INVOKE THIS ANONYMOUS FUNCTION TO DISPLAY HOMEWORK INSTRUCTIONS IN THE CONSOLE
