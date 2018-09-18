@@ -37,15 +37,15 @@
     }
 
     .red {
-        background-image: red;
+        background-color: red;
     }
 
     .blue {
-        background-image: blue;
+        background-color: blue;
     }
 
     .gold {
-        background-image: gold;
+        background-color: gold;
     }
 
 </style>
@@ -89,14 +89,6 @@
         clearDocument();
         var rootDiv = document.createElement('div');
         rootDiv.id = 'rootContainer';
-        var companyNamesContainer = document.createElement('div');
-        chicagoStartups.forEach(function(chicagoStartup, index) {
-            var childDiv = document.createElement('div');
-            var text = document.createTextNode(index.toString().concat(' .) ').concat(chicagoStartup));
-            childDiv.appendChild(text);
-            companyNamesContainer.appendChild(childDiv);
-        });
-        rootDiv.appendChild(companyNamesContainer);
         document.body.appendChild(rootDiv);
     }
 
@@ -115,15 +107,15 @@
         });
     }
 
-    function getElemenInnerAsList(aContainer) {
+    function listAndDeleteInnerHTML(aContainer) {
         /*
-        This removes the chile elements, but captures the inner HTML in a list
+        This removes the child elements, but captures the inner HTML in a list
         */
         retList = []
         while (aContainer.hasChildNodes()) {
             /*
-            this loop is grabbing the last elements in the doc and them to a list
-            list, reversing the order.
+            this loop is grabbing the last elements in the doc and 
+            adding them to a list, reversing the order.
             */
             retList.push(aContainer.firstChild.innerHTML);
             aContainer.removeChild(aContainer.firstChild);
@@ -132,38 +124,41 @@
     }
 
 
+
     function renderReverseWithoutReversing() {
         /*
         re-rendering element id=reverseContainer, in case the displayModeIndex has changed
         the toggle button just toggles the display mode, so we need to re-render without reversing.
         */
+
         var reverseContainer = document.getElementById('reverseContainer');
+        var containerStyle = displayModeIndex ? 'blue' : 'gold';
+        console.log('containerStyle', containerStyle);
+        reverseContainer.setAttribute('class', containerStyle);
         var myChicagoStartups = [];
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
                 // case when a prev click has initialized id 'reverseContainer' with list contents
-                myChicagoStartups = getElemenInnerAsList(reverseContainer)
+                myChicagoStartups = listAndDeleteInnerHTML(reverseContainer)
                 renderList(chicagoStartups, reverseContainer, displayModes[displayModeIndex])
             }
-
         }
     }
-
 
     function renderReversedElements() {
         /*
         event reversing element id=reverseContainer
-        I've left the flow somewhat as provided in the assignment, and I cal the provided stub:
+        I've left the flow somewhat as provided in the assignment, and I call the provided stub:
          - chicagoStartupsReverse()
         
         */
         var reverseContainer = document.getElementById('reverseContainer');
         var reversedChicagoStartups = [];
-        var myChicagoStartups;
+        var myChicagoStartups = [];
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
                 // case when a prev click has initialized id 'reverseContainer' with list contents
-                myChicagoStartups = getElemenInnerAsList(reverseContainer)
+                myChicagoStartups = listAndDeleteInnerHTML(reverseContainer)
                 reversedChicagoStartups = myReverse(myChicagoStartups)
                 renderList(reversedChicagoStartups, reverseContainer, displayModes[displayModeIndex])
             } else {
@@ -203,15 +198,71 @@
         return reversedStartups;
     }
 
+    function cleanAndCountString(aString) {
+        cleanStr = cleanString(aString);
+        cleanLenStr = cleanStr + ' ' + cleanStr.length;
+        return cleanLenStr;
+    }
+
+    function cleanString(aString) {
+        noSpecials = aString.replace(/[^A-Za-z0-9_ ]/g, '');
+        noRepeatedSpaces = noSpecials.replace(/ +/g, ' ');
+        return noRepeatedSpaces.trim();
+    }
+
     function cleanAndCountCharacters() {
-        console.log('CLEAN AND COUNT CHARACTERS');
+        cleanMode = ++cleanMode % 2
+        console.log('CLEAN AND COUNT CHARACTERS', cleanMode);
         /*
             TODO: REMOVES ANY SPECIAL CHARACTERS FROM EACH COMPANY NAME AND
               DISPLAYS THE NUMBER OF REMAINING CHARACTERS NEXT TO THE FULL WORD.
               DONT FORGET TO REMOVE LEADING AND TRAILING WHITESPACES AS WELL
         */
-        // extra credit by using an object to count the number of occurrences 
+        /*
+            renderCompanyNames() is sensative to the cleanMode 
+        */
+        renderCompanyNames();
+    }
 
+
+    function initCompanyNames() {
+        /*
+        creates companyNamesContainer as child of root.
+        */
+        var companyNamesContainer = document.createElement('div');
+        companyNamesContainer.id = 'companyNamesContainer';
+        companyNamesContainer.setAttribute('class', 'startups-container');
+        document.getElementById('rootContainer').appendChild(companyNamesContainer);
+    }
+
+    function renderCompanyNames() {
+        /*
+        render element id=companyNamesContainer
+        or re-render it whe the cleanMode has changed
+        via a toggle button.
+        */
+        var myCompanyNamesContainer = document.getElementById('companyNamesContainer');
+        if (myCompanyNamesContainer) {
+            if (myCompanyNamesContainer.hasChildNodes()) {
+                // myPreviousListing only useful for consile debugging. Point here is to Delete content. 
+                myPreviousListing = listAndDeleteInnerHTML(myCompanyNamesContainer)
+            }
+            var myNames = []
+            if (cleanMode) {
+                // want to use map here.  does it modify the original array?
+                myNames = chicagoStartups.map(cleanAndCountString);
+            } else {
+                myNames = chicagoStartups;
+            }
+            myNames.forEach(function(chicagoStartup, index) {
+                var childDiv = document.createElement('div');
+                var text = document.createTextNode(index.toString().concat('. ) ').concat(chicagoStartup));
+                childDiv.appendChild(text);
+                companyNamesContainer.appendChild(childDiv);
+            });
+        } else {
+            console.log("Trying to renderCompanyNames(), but element id=companyNamesContainer not initialized.")
+        }
     }
 
     function initReverse() {
@@ -257,18 +308,22 @@
         // PGSTODO - clean this up some.
         console.log('toggleDisplay called');
         displayModeIndex = (displayModeIndex + 1) % (displayModes.length);
-        console.log('displayModeIndex:', displayModeIndex)
+        //        console.log('displayModeIndex:', displayModeIndex)
         renderReverseWithoutReversing();
     }
 
     function run() {
         instructions();
         initDocument();
+        initCompanyNames();
+        renderCompanyNames();
         initReverse();
     }
 
-    displayModes = ['div', 'span'];
-    displayModeIndex = 1;
+    var displayModes = ['div', 'span'];
+    var displayModeIndex = 0;
+    var cleanMode = 0;
+
 
     var flags = {
         displayInstructions: true,
