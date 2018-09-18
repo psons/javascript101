@@ -211,6 +211,9 @@
     }
 
     function cleanAndCountCharacters() {
+        /*
+        Event call back for the "clean and count words" button.
+        */
         cleanMode = ++cleanMode % 2
         console.log('CLEAN AND COUNT CHARACTERS', cleanMode);
         /*
@@ -218,12 +221,51 @@
               DISPLAYS THE NUMBER OF REMAINING CHARACTERS NEXT TO THE FULL WORD.
               DONT FORGET TO REMOVE LEADING AND TRAILING WHITESPACES AS WELL
         */
-        /*
-            renderCompanyNames() is sensative to the cleanMode 
-        */
-        renderCompanyNames();
+        //is sensative to the cleanMod
+        renderCompanyNames()
+        // losds global object with the character tallies
+        tallyOfChars.loadListOfStrings(chicagoStartups.map(cleanString));
+        tallyOfChars.printMe();
+        initCount();
+        renderCount();
+
     }
 
+    function initCount() {
+        /*
+        creates countContainer as child of root.
+        */
+        var countContainer = document.createElement('div');
+        countContainer.id = 'countContainer';
+        countContainer.setAttribute('class', 'red');
+        document.getElementById('rootContainer').appendChild(countContainer);
+    }
+
+    function renderCount() {
+        /*
+        render element id=countContainer
+        or re-render it when called for an event.
+        */
+        var myCountContainer = document.getElementById('countContainer');
+        if (myCountContainer) {
+            if (myCountContainer.hasChildNodes()) {
+                // myPreviousListing only useful for consile debugging. Point here is to Delete content. 
+                myPreviousListing = listAndDeleteInnerHTML(myCountContainer)
+            }
+            /*todo - put the tally data  
+             - It should be created in the event callback that causes this.
+             - need the tally as a list of attribute:value strings
+             */
+            tallyOfChars.toListOfStrings().forEach(function(tallyLine, index) {
+                var childDiv = document.createElement('div');
+                var text = document.createTextNode(tallyLine);
+                childDiv.appendChild(text);
+                myCountContainer.appendChild(childDiv);
+            });
+        } else {
+            console.log("Trying to renderCount(), but element id=countContainer not initialized.")
+        }
+    }
 
     function initCompanyNames() {
         /*
@@ -278,6 +320,18 @@
         document.getElementById('rootContainer').appendChild(reverseContainer);
     }
 
+    function initTally() {
+        /*
+        creates tallyContainer as child of root, 
+        then diaplays the character tallys
+        */
+        var tallyContainer = document.createElement('div');
+        tallyContainer.id = 'tallyContainer';
+        // TODO put a method in tallyOfChars to get the attribs as a list of somthing i can add to a div.
+        // TODO perhaps call renderList
+        document.getElementById('rootContainer').appendChild(tallyContainer);
+    }
+
     function btnFactory(aLabel, aCallback) {
         var btn = document.createElement('button');
         console.log("aLabel", aLabel)
@@ -312,6 +366,53 @@
         renderReverseWithoutReversing();
     }
 
+    /*
+    The tallyOfChars object has methods to load strings and creat 
+    single character attributes is te count of the number of occurances in all strings loaded.
+    */
+    var tallyOfChars = {
+        data: {},
+        setAttr: function(dataAttr, val) {
+            this.data[dataAttr] = val;
+        },
+        tallyAttr: function(dataAttr) {
+            if (this.data[dataAttr]) {
+                this.data[dataAttr]++;
+            } else {
+                this.data[dataAttr] = 1;
+            }
+        },
+        loadString: function(aStr) {
+            for (ch in aStr) {
+                this.tallyAttr(aStr[ch]);
+            }
+        },
+        loadListOfStrings: function(aList) {
+            for (myItem in aList) {
+                this.loadString(aList[myItem]);
+                this.loadString(aList[myItem]);
+            }
+        },
+        toString: function() {
+            var val;
+            var retVal = "";
+            for (var dataAttr in this.data) {
+                retVal += dataAttr + ':' + this.data[dataAttr] + "\n"
+            }
+            return retVal;
+        },
+        toListOfStrings: function() {
+            var retList = [];
+            for (var dataAttr in this.data) {
+                retList.push(dataAttr + ':' + this.data[dataAttr])
+            }
+            return retList;
+        },
+        printMe: function() {
+            console.log(this.toString());
+        }
+    }
+
     function run() {
         instructions();
         initDocument();
@@ -344,11 +445,11 @@
                             HOMEWORK IS DUE WEDNESDAYS AT MIDNIGHT NO EXCEPTIONS.
                             dont forget to slack me the url to your github account as well.  
 
-                            You can earn extra credit by using the provided css classes in the style tag or additionally 
+                            TODO - You can earn extra credit by using the provided css classes in the style tag or additionally 
                             you can pull in an external css library like bootstrap.  if you bring in bootstrap make sure to style
                             the buttons using bootstraps built in button styling classes.
 
-                            Additionally, can earn extra credit by using an object to count the number of occurrences 
+                            TODO - Additionally, can earn extra credit by using an object to count the number of occurrences 
                             of each character accross all startup names and style and display the results as part of the
                             "cleanAndCountCharacters" function.
 
