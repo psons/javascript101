@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
 <h3>Javascript Basics</h3>
-<button onclick="cleanAndCountCharacters()">
+<div id="button-container">
+    <button onclick="cleanAndCountCharacters()">
         clean and count words
     </button>
+</div>
 
 <body>
 </body>
@@ -11,6 +13,11 @@
 </html>
 
 <style>
+    #button-container {
+        display: flex;
+
+    }
+
     #rootContainer {
         display: flex;
 
@@ -83,8 +90,7 @@
 
     function initDocument() {
         /*
-        starts out an empty root container and add the company names 
-        as a numbers list of div elements.
+        starts out an empty root container 
         */
         clearDocument();
         var rootDiv = document.createElement('div');
@@ -92,7 +98,7 @@
         document.body.appendChild(rootDiv);
     }
 
-    function renderList(aList, aContainer, anElemetType) {
+    function renderList(aList, aContainer, anElementType) {
         /*
         for each item in myList, 
          - use the item as contents in a myElementType
@@ -100,8 +106,8 @@
         */
         aList.forEach(function(itemText, index) {
             console.log(itemText);
-            var childElem = document.createElement(anElemetType);
-            var text = document.createTextNode(itemText);
+            var childElem = document.createElement(anElementType);
+            var text = document.createTextNode(itemText + ' ');
             childElem.appendChild(text);
             aContainer.appendChild(childElem);
         });
@@ -123,7 +129,12 @@
         return retList
     }
 
-
+    function toggleReversContainerStyle() {
+        let reverseContainer = document.getElementById('reverseContainer');
+        let containerStyle = displayModeIndex ? 'blue' : 'gold';
+        console.log('containerStyle', containerStyle);
+        reverseContainer.setAttribute('class', containerStyle);
+    }
 
     function renderReverseWithoutReversing() {
         /*
@@ -131,16 +142,12 @@
         the toggle button just toggles the display mode, so we need to re-render without reversing.
         */
 
-        var reverseContainer = document.getElementById('reverseContainer');
-        var containerStyle = displayModeIndex ? 'blue' : 'gold';
-        console.log('containerStyle', containerStyle);
-        reverseContainer.setAttribute('class', containerStyle);
-        var myChicagoStartups = [];
+        toggleReversContainerStyle();
         if (reverseContainer) {
             if (reverseContainer.hasChildNodes()) {
                 // case when a prev click has initialized id 'reverseContainer' with list contents
-                myChicagoStartups = listAndDeleteInnerHTML(reverseContainer)
-                renderList(chicagoStartups, reverseContainer, displayModes[displayModeIndex])
+                myChicagoStartups = listAndDeleteInnerHTML(reverseContainer); //not using this return value!
+                renderList(applyCleanMode(chicagoStartups), reverseContainer, displayModes[displayModeIndex])
             }
         }
     }
@@ -152,6 +159,7 @@
          - chicagoStartupsReverse()
         
         */
+        toggleReversContainerStyle();
         var reverseContainer = document.getElementById('reverseContainer');
         var reversedChicagoStartups = [];
         var myChicagoStartups = [];
@@ -204,6 +212,11 @@
         return cleanLenStr;
     }
 
+    function countString(aString) {
+        let retStr = aString + ' ' + aString.length;
+        return retStr;
+    }
+
     function cleanString(aString) {
         noSpecials = aString.replace(/[^A-Za-z0-9_ ]/g, '');
         noRepeatedSpaces = noSpecials.replace(/ +/g, ' ');
@@ -217,12 +230,13 @@
         cleanMode = ++cleanMode % 2
         console.log('CLEAN AND COUNT CHARACTERS', cleanMode);
         /*
-            TODO: REMOVES ANY SPECIAL CHARACTERS FROM EACH COMPANY NAME AND
+            TODone: REMOVES ANY SPECIAL CHARACTERS FROM EACH COMPANY NAME AND
               DISPLAYS THE NUMBER OF REMAINING CHARACTERS NEXT TO THE FULL WORD.
               DONT FORGET TO REMOVE LEADING AND TRAILING WHITESPACES AS WELL
         */
         //is sensative to the cleanMod
         renderCompanyNames()
+        renderReverseWithoutReversing(); // now sensative to clen mode
         // losds global object with the character tallies
         tallyOfChars.loadListOfStrings(chicagoStartups.map(cleanString));
         tallyOfChars.printMe();
@@ -252,10 +266,6 @@
                 // myPreviousListing only useful for consile debugging. Point here is to Delete content. 
                 myPreviousListing = listAndDeleteInnerHTML(myCountContainer)
             }
-            /*todo - put the tally data  
-             - It should be created in the event callback that causes this.
-             - need the tally as a list of attribute:value strings
-             */
             tallyOfChars.toListOfStrings().forEach(function(tallyLine, index) {
                 var childDiv = document.createElement('div');
                 var text = document.createTextNode(tallyLine);
@@ -277,11 +287,37 @@
         document.getElementById('rootContainer').appendChild(companyNamesContainer);
     }
 
+    function applyCleanMode(aList) {
+        /* caution the same mode is used for Clean and Count, but 
+        we dont allways count when we clean */
+        let retList = [];
+        if (cleanMode) {
+            // want to use map here.  does it modify the original array?
+            retList = aList.map(cleanString);
+        } else {
+            retList = aList;
+        }
+        return retList;
+    }
+
+    function applyCountMode(aList) {
+        /* caution the same mode is used for Clean and Count, but 
+        we dont allways count when we clean */
+        let retList = [];
+        if (cleanMode) {
+            // want to use map here.  does it modify the original array?
+            retList = aList.map(countString);
+        } else {
+            retList = aList;
+        }
+        return retList;
+    }
+
     function renderCompanyNames() {
         /*
         render element id=companyNamesContainer
-        or re-render it whe the cleanMode has changed
-        via a toggle button.
+         - or re-render it whe the cleanMode has changed via a toggle button.
+         - add the company names as a numbers list of div elements.
         */
         var myCompanyNamesContainer = document.getElementById('companyNamesContainer');
         if (myCompanyNamesContainer) {
@@ -289,13 +325,8 @@
                 // myPreviousListing only useful for consile debugging. Point here is to Delete content. 
                 myPreviousListing = listAndDeleteInnerHTML(myCompanyNamesContainer)
             }
-            var myNames = []
-            if (cleanMode) {
-                // want to use map here.  does it modify the original array?
-                myNames = chicagoStartups.map(cleanAndCountString);
-            } else {
-                myNames = chicagoStartups;
-            }
+            let myNames = applyCleanMode(chicagoStartups);
+            myNames = applyCountMode(myNames)
             myNames.forEach(function(chicagoStartup, index) {
                 var childDiv = document.createElement('div');
                 var text = document.createTextNode(index.toString().concat('. ) ').concat(chicagoStartup));
@@ -315,8 +346,8 @@
         var reverseContainer = document.createElement('div');
         reverseContainer.id = 'reverseContainer';
 
-        document.getElementById('rootContainer').appendChild(btnFactory('Reverse', renderReversedElements));
-        document.getElementById('rootContainer').appendChild(btnFactory('Toggle Display', toggleDisplay));
+        document.getElementById('button-container').appendChild(btnFactory('Reverse', renderReversedElements));
+        document.getElementById('button-container').appendChild(btnFactory('Toggle Display', toggleDisplay));
         document.getElementById('rootContainer').appendChild(reverseContainer);
     }
 
@@ -327,8 +358,6 @@
         */
         var tallyContainer = document.createElement('div');
         tallyContainer.id = 'tallyContainer';
-        // TODO put a method in tallyOfChars to get the attribs as a list of somthing i can add to a div.
-        // TODO perhaps call renderList
         document.getElementById('rootContainer').appendChild(tallyContainer);
     }
 
@@ -346,7 +375,7 @@
 
     function toggleDisplay() {
         /*
-        TODO: REVIEW THE CODE IN THE PROVIDED REVERSE EXAMPLE, USE JAVASCRIPT TO ADD A CLICKABLE BUTTON 
+        TODone: REVIEW THE CODE IN THE PROVIDED REVERSE EXAMPLE, USE JAVASCRIPT TO ADD A CLICKABLE BUTTON 
         CALLED "Toggle Display" ... WHEN THE USER CLICKS THE BUTTON, IT RENDERS THE DISPLAY OF THE COMPANY NAMES 
         FROM VERTICAL, TO HORIZONTAL.
         IF THE USER CLICKS THE TOGGLE BUTTON AGAIN THE NAMES SHOULD ONCE AGAIN BE DISPLAYED VERTICALLY.
@@ -359,10 +388,8 @@
 
             3.  
         */
-        // PGSTODO - clean this up some.
         console.log('toggleDisplay called');
         displayModeIndex = (displayModeIndex + 1) % (displayModes.length);
-        //        console.log('displayModeIndex:', displayModeIndex)
         renderReverseWithoutReversing();
     }
 
@@ -445,11 +472,11 @@
                             HOMEWORK IS DUE WEDNESDAYS AT MIDNIGHT NO EXCEPTIONS.
                             dont forget to slack me the url to your github account as well.  
 
-                            TODO - You can earn extra credit by using the provided css classes in the style tag or additionally 
+                            TODone - You can earn extra credit by using the provided css classes in the style tag or additionally 
                             you can pull in an external css library like bootstrap.  if you bring in bootstrap make sure to style
                             the buttons using bootstraps built in button styling classes.
 
-                            TODO - Additionally, can earn extra credit by using an object to count the number of occurrences 
+                            TODone - Additionally, can earn extra credit by using an object to count the number of occurrences 
                             of each character accross all startup names and style and display the results as part of the
                             "cleanAndCountCharacters" function.
 
